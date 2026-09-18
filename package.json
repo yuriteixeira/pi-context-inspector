@@ -1,0 +1,52 @@
+{
+  "name": "pi-context-inspector",
+  "author": "yuriteixeira",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Pi extension: inspect the system prompt, active tools, messages, token breakdown and full LLM context in a tabbed overlay",
+  "main": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuriteixeira/pi-context-inspector.git"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "coding-agent",
+    "extension",
+    "context",
+    "inspector",
+    "overlay",
+    "tokens"
+  ],
+  "license": "MIT",
+  "files": [
+    "index.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.84.0",
+    "@types/node": "^24.0.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.9",
+    "@earendil-works/pi-tui": "^0.84.0"
+  }
+}
