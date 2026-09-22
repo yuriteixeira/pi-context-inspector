@@ -1,7 +1,7 @@
 {
   "name": "pi-context-inspector",
   "author": "yuriteixeira",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "type": "module",
   "description": "Pi extension: inspect the system prompt, active tools, messages, token breakdown and full LLM context in a tabbed overlay",
   "main": "index.ts",
@@ -43,10 +43,10 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "^0.84.0",
-    "@types/node": "^24.0.0",
-    "typescript": "~5.9.3",
-    "vitest": "^4.1.9",
-    "@earendil-works/pi-tui": "^0.84.0"
+    "@earendil-works/pi-coding-agent": "^0.87.0",
+    "@earendil-works/pi-tui": "^0.87.0",
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
   }
 }
