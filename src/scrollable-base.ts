@@ -13,13 +13,14 @@ export abstract class ScrollableBase {
   protected visualLines: string[] = [];
   protected visualToLogical: number[] = [];
   protected visualTotal = 0;
+  protected visibleHeight = CONTENT_HEIGHT;
 
   protected abstract get rawText(): string;
   protected abstract get displayLines(): string[];
   protected abstract get theme(): Theme;
 
   protected getVisibleLines(): number {
-    return CONTENT_HEIGHT;
+    return this.visibleHeight;
   }
 
   protected buildVisualLines(innerWidth: number): void {
@@ -121,11 +122,11 @@ export abstract class ScrollableBase {
       return true;
     }
     if (matchesKey(data, Key.pageDown) || matchesKey(data, Key.ctrl("f"))) {
-      this.scrollDown(visibleLines - 2, maxOffset);
+      this.scrollDown(Math.max(1, visibleLines - 2), maxOffset);
       return true;
     }
     if (matchesKey(data, Key.pageUp) || matchesKey(data, Key.ctrl("b"))) {
-      this.scrollUp(visibleLines - 2);
+      this.scrollUp(Math.max(1, visibleLines - 2));
       return true;
     }
     if (matchesKey(data, Key.ctrl("d"))) {

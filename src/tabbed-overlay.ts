@@ -11,7 +11,7 @@
  */
 
 import type { Theme } from "@earendil-works/pi-coding-agent";
-import { Key, matchesKey } from "@earendil-works/pi-tui";
+import { Key, matchesKey, type TUI } from "@earendil-works/pi-tui";
 import { createBorderHelpers, createTitle, CONTENT_HEIGHT } from "./utils.js";
 
 /**
@@ -63,10 +63,13 @@ export interface TabbedOverlayOptions {
 	done: () => void;
 }
 
+export const OVERLAY_HEIGHT_PERCENT = 90;
+const FRAME_HEIGHT = 7; // Top, title, tabs, separator, footer separator, footer, bottom.
+
 export class TabbedOverlay {
 	private activeTabIndex = 0;
 
-	constructor(private opts: TabbedOverlayOptions) {}
+	constructor(private opts: TabbedOverlayOptions, private tui: TUI) {}
 
 	private get activeTab(): TabContent {
 		return this.opts.tabs[this.activeTabIndex]!;
@@ -96,6 +99,9 @@ export class TabbedOverlay {
 	render(width: number): string[] {
 		const th = this.opts.theme;
 		const innerW = width - 2;
+		// Pi clips overlay lines beyond maxHeight from the bottom, including the footer.
+		const maxHeight = Math.max(1, Math.floor(this.tui.terminal.rows * OVERLAY_HEIGHT_PERCENT / 100));
+		const contentHeight = Math.min(CONTENT_HEIGHT, Math.max(0, maxHeight - FRAME_HEIGHT));
 		const lines: string[] = [];
 
 		const { row, borderTop, borderSep, borderBottom } = createBorderHelpers(th, innerW);
@@ -126,8 +132,8 @@ export class TabbedOverlay {
 		}
 
 		// ── Content area ─────────────────────────────────────────────────────────
-		const contentLines = this.activeTab.renderContent(innerW, CONTENT_HEIGHT);
-		for (let i = 0; i < CONTENT_HEIGHT; i++) {
+		const contentLines = this.activeTab.renderContent(innerW, contentHeight);
+		for (let i = 0; i < contentHeight; i++) {
 			if (i < contentLines.length) {
 				lines.push(row(contentLines[i]!));
 			} else {

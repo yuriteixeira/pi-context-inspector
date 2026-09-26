@@ -71,6 +71,7 @@ export class ScrollableTabContent extends ScrollableBase implements TabContent {
   }
 
   renderContent(innerWidth: number, height: number): string[] {
+    this.visibleHeight = height;
     this.buildVisualLines(innerWidth);
     const th = this.opts.theme;
     const lines: string[] = [];

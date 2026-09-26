@@ -29,7 +29,7 @@ import {
 import { openInExternalEditor } from "./external-editor.js";
 import { ScrollableTabContent } from "./scrollable-tab-content.js";
 import { type ContextTokenBreakdown, StatsTabContent } from "./stats-tab-content.js";
-import { TabbedOverlay } from "./tabbed-overlay.js";
+import { OVERLAY_HEIGHT_PERCENT, TabbedOverlay } from "./tabbed-overlay.js";
 import { formatTokens } from "./utils.js";
 
 type AgentMessage = SessionContext["messages"][number];
@@ -373,7 +373,7 @@ const OVERLAY_OPTIONS = {
 		anchor: "center" as const,
 		width: "90%" as const,
 		minWidth: 60,
-		maxHeight: "90%" as const,
+		maxHeight: `${OVERLAY_HEIGHT_PERCENT}%` as const,
 	},
 };
 
@@ -440,7 +440,7 @@ export default function contextViewerExtension(pi: ExtensionAPI): void {
 					tabs,
 					theme,
 					done,
-				});
+				}, tui);
 			}, OVERLAY_OPTIONS);
 		},
 	});
