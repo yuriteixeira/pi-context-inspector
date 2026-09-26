@@ -56,14 +56,18 @@ function numberedTab(text: string, name: string, theme: Theme, onOpenEditor: () 
 	);
 }
 
-function formatContent(content: MessageContent): string[] {
+function stripColorSequences(text: string): string {
+	return text.replace(/\x1b\[[0-9;:]*m/g, "");
+}
+
+function formatContent(content: MessageContent, stripColors = false): string[] {
 	if (typeof content === "string") return [content];
 
 	const lines: string[] = [];
 	for (const block of content) {
 		switch (block.type) {
 			case "text":
-				lines.push(block.text);
+				lines.push(stripColors ? stripColorSequences(block.text) : block.text);
 				break;
 			case "thinking":
 				lines.push(`[Thinking: ${block.thinking}]`);
@@ -90,7 +94,7 @@ function formatUsage(usage: AssistantMessage["usage"]): string {
 	parts.push(`total: ${usage.totalTokens}`);
 	return `Tokens: ${parts.join(", ")}`;
 }
-export function formatMessageForDisplay(message: SessionContext["messages"][number], index: number): string[] {
+export function formatMessageForDisplay(message: SessionContext["messages"][number], index: number, editorView = false): string[] {
 	const lines: string[] = ["", `──── Message ${index + 1} ────`, `Role: ${message.role}`];
 
 	if (message.role === "assistant") {
@@ -138,16 +142,16 @@ export function formatMessageForDisplay(message: SessionContext["messages"][numb
 	}
 
 	if ("content" in message) {
-		lines.push(...formatContent(message.content));
+		lines.push(...formatContent(message.content, editorView && message.role === "toolResult"));
 	}
 	return lines;
 }
 
-export function formatMessagesText(context: SessionContext): string {
+export function formatMessagesText(context: SessionContext, editorView = false): string {
 	const lines: string[] = [];
 	if (context.messages.length > 0) {
 		for (let i = 0; i < context.messages.length; i++) {
-			lines.push(...formatMessageForDisplay(context.messages[i]!, i));
+			lines.push(...formatMessageForDisplay(context.messages[i]!, i, editorView));
 		}
 	} else {
 		lines.push("(no messages yet)");
@@ -166,6 +170,7 @@ export function buildTotalContextText(
 	context: SessionContext,
 	usage: ContextUsage | undefined,
 	model: ContextViewerModelInfo | undefined,
+	editorView = false,
 ): string {
 	const sections: string[] = [];
 
@@ -179,7 +184,7 @@ export function buildTotalContextText(
 	sections.push("MESSAGES");
 	sections.push("═══════════════════════════════════════════════════════");
 
-	sections.push(formatMessagesText(context));
+	sections.push(formatMessagesText(context, editorView));
 
 	sections.push("");
 	sections.push("═══════════════════════════════════════════════════════");
@@ -425,8 +430,8 @@ export default function contextViewerExtension(pi: ExtensionAPI): void {
 					}),
 					numberedTab(systemPrompt, "System", theme, editorAction("System", systemPrompt)),
 					numberedTab(toolsText, "Tools", theme, editorAction("Tools", toolsText)),
-					numberedTab(messagesText, "Messages", theme, editorAction("Messages", messagesText)),
-					numberedTab(fullText, "Full", theme, editorAction("Full", fullText)),
+					numberedTab(messagesText, "Messages", theme, editorAction("Messages", formatMessagesText(context, true))),
+					numberedTab(fullText, "Full", theme, editorAction("Full", buildTotalContextText(systemPrompt, context, usage, ctx.model, true))),
 				];
 
 				return new TabbedOverlay({

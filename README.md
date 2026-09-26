@@ -20,7 +20,7 @@ Run `/context` at any point during a session:
 /context
 ```
 
-The overlay opens with the Stats tab active. `Tab` / `Shift+Tab` cycles tabs, `q` or `Escape` closes the overlay. On System, Tools, Messages, or Full, press `e` to open that view in `$EDITOR`. Pi resumes when the editor exits. Any edits to the temporary file are discarded and do not change the session. Stats and Skills do not have editor views; Skills is a category in Stats, not a separate tab.
+The overlay opens with the Stats tab active. `Tab` / `Shift+Tab` cycles tabs, `q` or `Escape` closes the overlay. On System, Tools, Messages, or Full, press `e` to open that view in `$EDITOR`. Pi resumes when the editor exits. Any edits to the temporary file are discarded and do not change the session. The editor removes color codes from tool results in Messages and Full; the overlay and copied text keep the original content. Stats and Skills do not have editor views; Skills is a category in Stats, not a separate tab.
 
 ## Installation
 
