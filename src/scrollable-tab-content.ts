@@ -6,6 +6,7 @@ export interface ScrollableTabContentOptions {
   rawText: string;
   displayLines: string[];
   theme: Theme;
+  onOpenEditor?: () => void;
 }
 
 export class ScrollableTabContent extends ScrollableBase implements TabContent {
@@ -56,10 +57,17 @@ export class ScrollableTabContent extends ScrollableBase implements TabContent {
     return left;
   }
 
-  readonly footerHints = "↑↓ scroll · / search · n/N next · y copy";
+  get footerHints(): string {
+    return `↑↓ scroll · / search · n/N next · y copy${this.opts.onOpenEditor ? " · e editor" : ""}`;
+  }
 
   handleInput(data: string): boolean {
-    return this.handleScrollKey(data);
+    if (this.handleScrollKey(data)) return true;
+    if (data === "e" && this.opts.onOpenEditor) {
+      this.opts.onOpenEditor();
+      return true;
+    }
+    return false;
   }
 
   renderContent(innerWidth: number, height: number): string[] {

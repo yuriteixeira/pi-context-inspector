@@ -26,6 +26,7 @@ import {
 	type Theme,
 	type ToolInfo,
 } from "@earendil-works/pi-coding-agent";
+import { openInExternalEditor } from "./external-editor.js";
 import { ScrollableTabContent } from "./scrollable-tab-content.js";
 import { type ContextTokenBreakdown, StatsTabContent } from "./stats-tab-content.js";
 import { TabbedOverlay } from "./tabbed-overlay.js";
@@ -48,9 +49,9 @@ export function buildNumberedLines(text: string, theme: Theme): string[] {
 	});
 }
 
-function numberedTab(text: string, name: string, theme: Theme): ScrollableTabContent {
+function numberedTab(text: string, name: string, theme: Theme, onOpenEditor: () => void): ScrollableTabContent {
 	return new ScrollableTabContent(
-		{ rawText: text, displayLines: buildNumberedLines(text, theme), theme },
+		{ rawText: text, displayLines: buildNumberedLines(text, theme), theme, onOpenEditor },
 		name,
 	);
 }
@@ -402,18 +403,30 @@ export default function contextViewerExtension(pi: ExtensionAPI): void {
 					: "no usage data yet";
 
 			// ── Build and open the overlay ──────────────────────────────────────
-			await ctx.ui.custom<void>((_tui, theme, _keybindings, done) => {
+			await ctx.ui.custom<void>((tui, theme, _keybindings, done) => {
 				const modelName = ctx.model?.id ?? "unknown model";
+				let editorOpen = false;
+				const editorAction = (name: string, text: string) => async () => {
+					if (editorOpen) return;
+					editorOpen = true;
+					try {
+						await openInExternalEditor(tui, name, text);
+					} catch (error) {
+						ctx.ui.notify(`Cannot open editor: ${error instanceof Error ? error.message : String(error)}`, "error");
+					} finally {
+						editorOpen = false;
+					}
+				};
 
 				const tabs = [
 					new StatsTabContent(breakdown, theme, {
 						name: modelName,
 						contextWindow: ctx.model?.contextWindow ?? usage?.contextWindow,
 					}),
-					numberedTab(systemPrompt, "System", theme),
-					numberedTab(toolsText, "Tools", theme),
-					numberedTab(messagesText, "Messages", theme),
-					numberedTab(fullText, "Full", theme),
+					numberedTab(systemPrompt, "System", theme, editorAction("System", systemPrompt)),
+					numberedTab(toolsText, "Tools", theme, editorAction("Tools", toolsText)),
+					numberedTab(messagesText, "Messages", theme, editorAction("Messages", messagesText)),
+					numberedTab(fullText, "Full", theme, editorAction("Full", fullText)),
 				];
 
 				return new TabbedOverlay({
